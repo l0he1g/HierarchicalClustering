@@ -73,10 +73,11 @@ bool Controller::initialize() {
     if (data_pt.empty()) 
 		EXIT_ERROR("data_pt is not valid data file!");
         
+	cout << "read docs:" << data_pt << endl;
     read_docs(data_pt.c_str());
-    if (m_docs.empty())
+    if (m_clusters.empty())
         EXIT_ERROR2("no documents read from ", data_pt.c_str());
-    cout << "readed documents, size = " << m_docs.size() <<endl;
+    cout << "readed documents as initial clusters, size = " << m_clusters.size() <<endl;
 
     // initialize dimArray
     size_t dim_size = atol( m_conf.get("feature_dimension")); 
@@ -89,6 +90,9 @@ bool Controller::initialize() {
 	if (!m_conf.has_key("result_pt"))
 		EXIT_ERROR("result_pt is not set!");
 
+    cout << "intialize cid_pCluster table and dimArray" << endl;
+    init_tool();
+    
     printf("initialization ended\n");
     return true;
 }
@@ -99,23 +103,57 @@ void Controller::read_docs(const char* data_pt) {
 	  EXIT_ERROR2("Cannot open data file:", data_pt);	
 
     string line;
-    size_t i = 0;
+	clock_t start = clock(); 
+    size_t looper = 0;
     while (getline(inf, line)) {
 		util::trim(line);
 		if (line.empty()) {
-			cout<< "[Warn] empty line:" << i<<endl;
+			cout<< "[Warn] empty line:" << looper <<endl;
             continue;
         }
-        m_docs.push_back(line);
-        ++i;
+        m_clusters.push_back(line);
+
+		// time counter
+		if (++looper % 10000 == 0) {
+			clock_t finish = clock();
+			double duration = (double)(finish - start) / CLOCKS_PER_SEC; 
+			printf("finish read docs:%d, cost %f s\n", looper, duration);
+			start = finish;
+		}
     }
 }
 
+/*
+ * @Function
+ *    initialize each document as a cluster
+ */
+void Controller::init_tool() {
+	clock_t start = clock(); 
+    // one traversal
+    m_cid_ps.resize(m_clusters.size());
+    size_t looper = 0;
+    for (list<Cluster>::iterator it_c = m_clusters.begin();
+         it_c != m_clusters.end();
+         ++it_c) {
+        // update cid-cluster_iterator table
+        m_cid_ps[it_c->id()] = it_c;
+        
+        // update dimAarray
+        m_dims.add_cluster_seq(*it_c);
+
+		// time counter
+		if (++looper % 10000 == 0) {
+			clock_t finish = clock();
+			double duration = (double)(finish - start) / CLOCKS_PER_SEC; 
+			printf("finish init clusters:%d, cost %f s\n", looper, duration);
+			start = finish;
+		}
+    }
+}
+
+
 void Controller::run(){
-    printf("docs init cluster\n");
-    doc_clustering_init();
-    printf("docs init cluster end\n");
-    
+    cout << "Running" << endl;
     int looper = 0;
     size_t k = m_clusters.size();
     
@@ -131,65 +169,7 @@ void Controller::run(){
 
 	printf("last clusters size = %d\n", k);
 }
-    
-/*
- * @Function
- *    initialize each document as a cluster
- */
-void Controller::doc_clustering_init() {
-	clock_t start = clock(); 
-    // one traversal
-    size_t n_docs = m_docs.size();
-    
-    m_cid_ps.resize(n_docs);
-    size_t looper = 0;
-    for (list<Doc>::const_iterator it_d = m_docs.begin();
-         it_d != m_docs.end();
-         ++it_d) {
-		//  if (looper > 140000) {
-		//	// assign a document('s iterator) to a cluster
-		//	m_clusters.push_back(Cluster(m_clusters.size()));
-		//	Cluster& c= m_clusters.back();
-
-		//	CLOCK_TEST(c.insert(it_d);)
-
-		//	pCluster it_c = m_clusters.end();
-		//	it_c--;//get the iterator before the last
-
-		//	// update cid-cluster_iterator table
-		//	CLOCK_TEST(m_cid_ps[c.id()] = it_c;)
-  //      
-		//	// update dimAarray
-		//	CLOCK_TEST(m_dims.add_cluster_seq(*it_c);)
-		//}
-		//else {
-			// assign a document('s iterator) to a cluster
-			m_clusters.push_back(Cluster(m_clusters.size()));
-			Cluster& c= m_clusters.back();
-
-			c.insert(it_d);
-
-			pCluster it_c = m_clusters.end();
-			it_c--;//get the iterator before the last
-
-			// update cid-cluster_iterator table
-			m_cid_ps[c.id()] = it_c;
-        
-			// update dimAarray
-			m_dims.add_cluster_seq(*it_c);
-		//}
-
-		// time counter
-		if (++looper % 10000 == 0) {
-			clock_t finish = clock();
-			double duration = (double)(finish - start) / CLOCKS_PER_SEC; 
-			printf("finish num:%d, cost %f s\n", looper, duration);
-			start = finish;
-		}
-    }
-}
-
-
+   
 /*
  * @Function
  *    travel all clusters sequentially, merge two clusters if similar enough

@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include "Cluster.h"
 
+double Cluster::w_Jaccard = 0.5;
+double Cluster::short_penalizer = 0.0;
+
 // initilize a clustering by words weight string
 // Notice:must make sure s is ascending order
 Cluster::Cluster(const string& s) {
@@ -16,8 +19,8 @@ Cluster::Cluster(const string& s) {
     vector<string> wvs = util::split(tmps[1], ',');
     for (vector<string>::iterator it = wvs.begin();
          it != wvs.end();
-         ++it) {
-        m_words.insert(m_words.end()--, *it);
+         ++it) {			 
+        m_words.insert(*it);
     }
     // set document ids
     m_docs.push_back(m_id);

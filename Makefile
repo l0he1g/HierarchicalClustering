@@ -9,9 +9,9 @@ $(EXE):$(OBJ)
 	$(CC) $(OBJ) -o $@
 
 test.o:Controller.h
-Cluster.o:Cluster.h string_util.h
-Doc.o:Doc.h string_util.h
+Cluster.o:Cluster.h string_util.h Word.h
 Controller.o:Controller.h Cluster.h Config.h DimArray.h
+DimArray.o:DimArray.h Word.h
 
 %.o:%.cpp
 	$(CC) $(CFLAGS) $< -o $@

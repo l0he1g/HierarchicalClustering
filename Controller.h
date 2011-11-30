@@ -30,7 +30,6 @@ private:
 	//size_t m_K;                    // max clusters number
 	size_t m_max_cluster_size;    // upper bound of a cluster size
 
-    list<Doc> m_docs;
     list<Cluster> m_clusters;
     // keep the random access property of clusters
     vector<pCluster> m_cid_ps;
@@ -42,8 +41,7 @@ private:
     // each line is a cluster:k:v,k:v
     void read_docs(const char* data_pt);
 
-    // initialize each document as a cluster
-    void doc_clustering_init();
+    void init_tool();
 
     // clustering clusters
     size_t cluster_merging(double sim_thres);

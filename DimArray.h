@@ -17,7 +17,7 @@
 #include <list>
 #include <set>
 #include "Cluster.h"
-#include "Doc.h"
+#include "Word.h"
 
 class DimArray {
 private:

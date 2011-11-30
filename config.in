@@ -13,10 +13,11 @@ min_sim = 0.10
 w_Jaccard = 0.5
 
 # doc.txt format:doc_id    w:n,...,...
-#data_pt = data/test_doc.txt
-data_pt = /home/yxh/xh/webRec/mid/voca/doc.txt
+data_pt = doc.txt
+#data_pt = /home/yxh/xh/webRec/mid/voca/doc.txt
 
-result_pt = /home/yxh/xh/webRec/mid/clustering
+result_pt = .
+#result_pt = /home/yxh/xh/webRec/mid/clustering
 
 # the similarity multiply it after each iteration, (0,1)
 # reduce it will less iterations number
