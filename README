@@ -1,0 +1,57 @@
+Hierarchical Clustering for Documents Data
+
+There is a modified hierarchial clustering method for large scale and
+sparse data, such as documents corpus, which only need one scan of
+origin data. The key points different from tranditional hierarchial
+clustering are
+	1. A dimAarray structure is utilized to speed up similar clusters
+	search
+    2. A diameter parameter 'threshold' is used to control aggregation: during the
+	doc travesal process, current doc is combined into the closest
+	clusters if their distance is less than 'threshold', else it forms
+	a new clusters.
+
+Distance between a doc and a cluster is computed by the Euclidean
+distance between the doc and the avarage of documents in the cluster.
+
+Input(setting in config.in)
+    1. doc.txt    each line is a doc in format:
+	   id:v,id:v,...
+
+Output
+    1. result_pt in config.in
+	   format:(output:centroid    docs)
+	          w1:weight,w2:weight,...   doc1, doc2, ...
+
+Data Structure
+	 1.Word  A word unit, with member variables:
+	 		  long id;
+			  double v;
+	 2.Doc   A document unit, with member variables:
+	 		  long id;
+			  vector<Word> m_words;  //weight of words are normalized in doc
+	 3.Cluster  A cluster unit with member variables:
+	 	     	 long m_id;
+				 //Used to compute distance between two clusters, may change to be mean or others.
+				 list<Word> m_centroid;   
+				 vector<const Doc*> m_docs;
+	 4.DimArray  Index clusters by words, used to speed up the similiar clusters search process.
+	  			 vector< list<Cluster*> > dim;
+				 This data structure is descripted in "Context-Aware
+				 	 Query Suggestion by Mining Click-Through and
+					 Session Data", Huanhuan Cao et.al. KDD 2008
+   	 5.Clustering  Main work class
+	 
+NOTICE:
+     The conifig.in should be UNIX format, dos2unix command will help to
+     convert a dos format to UNIX one. Otherwise, the parameters may will
+     not resolved (string.substr() will return wrong reuslt).
+
+ 聚类流程
+1. 逐个文档，从前往后，依次生成clusters
+   1) 第一个文档，对应第一个cluster
+   2) 从第二个以后的文档，先往前找最近的cluster(通过dimarray缩小检索范
+   围)，如果相似度大于阈值，则合并；反之，生成一个独立的cluster
+
+改进策略
+
