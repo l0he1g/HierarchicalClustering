@@ -1,0 +1,33 @@
+############ configuration of clustering ################
+#  Xiaohui Yan <xhcloud@gmail.com>  2011-11-11
+#            Happy Single's Day!
+#########################################################
+# if the similarity greater than it, than clustering them
+sim_thres = 0.5
+
+# if the sim_thres smaller than min_sim, looping ended
+# should be too small, it used to control cluster num
+min_sim = 0.10
+
+# the Jaccard similarity's weight, also a in a_sim
+w_Jaccard = 0.5
+
+# doc.txt format:doc_id    w:n,...,...
+#data_pt = data/test_doc.txt
+data_pt = /home/yxh/xh/webRec/mid/voca/doc.txt
+
+result_pt = /home/yxh/xh/webRec/mid/clustering
+
+# the similarity multiply it after each iteration, (0,1)
+# reduce it will less iterations number
+factor = 0.9
+
+# penalize Jaccard similarity for very short text
+# reduce it has the effect lower the min_sim sharply
+short_penalizer = 0.0
+
+# if a cluster's size large than it, stop merging with other clusters
+max_cluster_size = 100000
+
+# words num
+feature_dimension = 19706
